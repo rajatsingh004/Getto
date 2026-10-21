@@ -1,0 +1,60 @@
+apiVersion: consul.hashicorp.com/v1alpha1
+kind: RouteHeaderMatchInvertFilter
+metadata: {name: invert-x-canary, namespace: igw-test}
+spec:
+  headerNames: ["x-canary"]
+---
+apiVersion: consul.hashicorp.com/v1alpha1
+kind: RouteUpstreamLimitsFilter
+metadata: {name: web-limits, namespace: igw-test}
+spec:
+  maxConnections: 10
+  maxPendingRequests: 5
+  maxConcurrentRequests: 20
+  passiveHealthCheck:
+    interval: 5s
+    maxFailures: 3
+    enforcingConsecutive5xx: 80
+    maxEjectionPercent: 50
+    baseEjectionTime: 20s
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata: {name: web-route, namespace: igw-test}
+spec:
+  parentRefs: [{name: igw-gw, namespace: consul, sectionName: http}]
+  rules:
+  - matches:
+    - path: {type: PathPrefix, value: /invert}
+      headers: [{type: Exact, name: x-canary, value: "true"}]
+    filters:
+    - type: ExtensionRef
+      extensionRef: {group: consul.hashicorp.com, kind: RouteHeaderMatchInvertFilter, name: invert-x-canary}
+    backendRefs:
+    - name: web-v2
+      port: 8080
+      filters:
+      - type: ExtensionRef
+        extensionRef: {group: consul.hashicorp.com, kind: RouteUpstreamLimitsFilter, name: web-limits}
+  - matches:
+    - path: {type: PathPrefix, value: /}
+    backendRefs:
+    - {name: web, port: 8080}
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata: {name: grpc-route, namespace: igw-test}
+spec:
+  parentRefs: [{name: igw-gw, namespace: consul, sectionName: grpc}]
+  rules:
+  - backendRefs:
+    - {name: grpcsvc, port: 8079}
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata: {name: h2-route, namespace: igw-test}
+spec:
+  parentRefs: [{name: igw-gw, namespace: consul, sectionName: h2}]
+  rules:
+  - backendRefs:
+    - {name: web, port: 8080}
