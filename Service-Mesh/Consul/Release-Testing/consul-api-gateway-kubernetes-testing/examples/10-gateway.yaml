@@ -1,0 +1,30 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: igw-gw
+  namespace: consul
+  annotations:
+    api-gateway.consul.hashicorp.com/listener-grpc-protocol: grpc
+    api-gateway.consul.hashicorp.com/listener-h2-protocol: http2
+    api-gateway.consul.hashicorp.com/default-max-connections: "100"
+    api-gateway.consul.hashicorp.com/default-max-pending-requests: "50"
+    api-gateway.consul.hashicorp.com/default-max-concurrent-requests: "75"
+    api-gateway.consul.hashicorp.com/default-passive-health-check-interval: "10s"
+    api-gateway.consul.hashicorp.com/default-passive-health-check-max-failures: "4"
+    api-gateway.consul.hashicorp.com/default-passive-health-check-max-ejection-percent: "30"
+spec:
+  gatewayClassName: consul
+  listeners:
+  - {name: http, port: 8080, protocol: HTTP, allowedRoutes: {namespaces: {from: All}}}
+  - {name: grpc, port: 8081, protocol: HTTP, allowedRoutes: {namespaces: {from: All}}}
+  - {name: h2, port: 8082, protocol: HTTP, allowedRoutes: {namespaces: {from: All}}}
+---
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: ReferenceGrant
+metadata: {name: allow-consul-routes, namespace: igw-test}
+spec:
+  from:
+  - {group: gateway.networking.k8s.io, kind: HTTPRoute, namespace: igw-test}
+  - {group: gateway.networking.k8s.io, kind: Gateway, namespace: consul}
+  to:
+  - {group: "", kind: Service}
