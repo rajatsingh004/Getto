@@ -1,0 +1,56 @@
+# Template only: replace placeholders and validate keys against the target chart version.
+# Keep passwords, client secrets, cookie secrets, and private keys in Kubernetes Secrets.
+image:
+  repository: "OPERATIONS_HUB_IMAGE_REPOSITORY"
+  tag: "2.1.0-rc2"
+
+neo4j:
+  install:
+    enabled: false
+  uri: "bolt://NEO4J_HOST:7687"
+  database: "NEO4J_DATABASE"
+  username: "NEO4J_USERNAME"
+  existingSecret: "operations-hub-neo4j"
+
+connectInject:
+  enabled: true
+  datacenter: "dc1"
+  namespace: "default"
+  partition: "default"
+
+consulGateway:
+  enabled: true
+  gateway:
+    listeners:
+      - name: https
+        protocol: HTTPS
+        port: 443
+        tls:
+          mode: Terminate
+          certificateRefs:
+            - group: ""
+              kind: Secret
+              name: operations-hub-tls
+  httpRoute:
+    hostnames:
+      - "HUB_HOST"
+    listenerName: "https"
+    ingestTimeout: "300s"
+
+proxyDefaults:
+  enabled: true
+
+auth:
+  enabled: true
+  publicUrl: "https://HUB_HOST"
+  keycloak:
+    enabled: true
+    adminPassword: "<use-a-secret-or-secret-reference>"
+  oauth2proxy:
+    clientId: "oauth2-proxy"
+    existingSecret: "operations-hub-oidc"
+    oidc:
+      issuerUrl: "https://HUB_HOST/realms/cmp"
+    cookieSecure: true
+    allowedEmailDomains:
+      - "YOUR_DOMAIN"
