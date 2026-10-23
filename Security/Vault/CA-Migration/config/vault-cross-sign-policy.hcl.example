@@ -1,0 +1,6 @@
+# Replace <ROOT_PKI_PATH> with the active Vault CA RootPKIPath.
+# Apply only to the Vault token/auth method used by the Consul CA provider.
+# Remove this elevated permission after the cross-sign operation succeeds.
+path "<ROOT_PKI_PATH>/root/sign-self-issued" {
+  capabilities = ["sudo", "update"]
+}
