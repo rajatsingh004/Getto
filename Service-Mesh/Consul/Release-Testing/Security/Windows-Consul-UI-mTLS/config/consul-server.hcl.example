@@ -1,0 +1,34 @@
+# Lab example for one Consul server. Replace placeholders before use.
+# Stage certificates on every agent before enabling incoming verification
+# in a multi-agent datacenter.
+datacenter = "<DATACENTER>"
+data_dir   = "/opt/consul"
+bind_addr  = "<SERVER_PRIVATE_IP>"
+client_addr = "<SERVER_PRIVATE_IP>"
+
+server = true
+bootstrap_expect = 1
+
+ui_config {
+  enabled = true
+}
+
+ports {
+  http  = -1
+  https = 8501
+}
+
+tls {
+  defaults {
+    ca_file                = "/opt/consul/tls/consul-agent-ca.pem"
+    cert_file              = "/opt/consul/tls/consul-server.pem"
+    key_file               = "/opt/consul/tls/consul-server-key.pem"
+    verify_incoming        = true
+    verify_outgoing        = true
+    verify_server_hostname = true
+  }
+
+  https {
+    verify_incoming = true
+  }
+}
