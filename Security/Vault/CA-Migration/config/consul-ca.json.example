@@ -1,0 +1,8 @@
+{
+  "Provider": "consul",
+  "Config": {
+    "IntermediateCertTTL": "8760h",
+    "LeafCertTTL": "72h"
+  },
+  "ForceWithoutCrossSigning": false
+}
