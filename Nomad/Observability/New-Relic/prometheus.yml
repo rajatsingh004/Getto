@@ -1,0 +1,23 @@
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: "nomad"
+    metrics_path: /v1/metrics
+    params:
+      format: ["prometheus"]
+    static_configs:
+      - targets:
+          - "<NOMAD_SERVER_PRIVATE_IP>:4646"
+        labels:
+          role: "server"
+      - targets:
+          - "<NOMAD_CLIENT_PRIVATE_IP>:4646"
+        labels:
+          role: "client"
+
+remote_write:
+  - url: "https://metric-api.newrelic.com/prometheus/v1/write?prometheus_server=nomad-prod"
+    authorization:
+      type: Bearer
+      credentials_file: "/etc/prometheus/secrets/newrelic-license-key"
