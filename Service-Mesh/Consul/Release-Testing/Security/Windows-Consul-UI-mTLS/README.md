@@ -32,7 +32,7 @@ This lab project demonstrates Consul HTTPS with mutual TLS (mTLS), using a priva
 
 ## Security and scope
 
-This is a learning lab, not a production PKI design. Do not commit generated keys, certificates, PFX files, passwords, or production configuration. A client certificate establishes TLS identity; it does not grant Consul ACL permissions. If ACLs are enabled, authenticate with an authorized token or the configured UI login method.
+Do not commit generated keys, certificates, PFX files, passwords, or production configuration. A client certificate establishes TLS identity; it does not grant Consul ACL permissions. If ACLs are enabled, authenticate with an authorized token or the configured UI login method.
 
 The generated server SANs include Consul's default RPC server name server.<datacenter>.consul plus the supplied UI DNS name and IP. The sample uses a one-server bootstrap setting. Adapt it for a real cluster and follow the [Consul TLS rollout guidance](https://developer.hashicorp.com/consul/docs/secure/encryption/tls/mtls).
 
