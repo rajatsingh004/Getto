@@ -1,0 +1,4 @@
+basicConstraints=CA:FALSE
+keyUsage=critical,digitalSignature,keyEncipherment
+extendedKeyUsage=serverAuth,clientAuth
+subjectAltName=IP:<SERVER_PRIVATE_IP>,DNS:consul-server-1,DNS:server.<DATACENTER>.consul,DNS:<CONSUL_UI_HOSTNAME>
